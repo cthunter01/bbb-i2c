@@ -20,6 +20,15 @@ int main(int argc, char* argv[])
     DS3231 ds3231(2);
     if(ds3231.initComms())
     {
+        /*
+        ds3231.writeTime(22,
+                         5,
+                         30,
+                         2,
+                         14,
+                         36,
+                         0);
+        */
         for(int i = 0; i < 60; ++i)
         {
             usleep(1000000);

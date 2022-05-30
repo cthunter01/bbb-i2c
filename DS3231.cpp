@@ -17,6 +17,7 @@
 
 // For I2C
 #include <linux/i2c-dev.h>
+#include <i2c/smbus.h>
 
 #include <string>
 #include <iostream>
@@ -65,8 +66,47 @@ void DS3231::writeTime(std::uint8_t year,
                        std::uint8_t minute,
                        std::uint8_t second)
 {
-    std::uint8_t reg{0x0};
-    write(i2cbus, &reg, 1);
+    // Create the BCD format expected by DS3231
+    std::uint8_t buf[8];
+    buf[0] = 0x0;
+
+    buf[1] = second / 10;
+    buf[1] <<= 4;
+    buf[1] += second % 10;
+
+    buf[2] = minute / 10;
+    buf[2] <<= 4;
+    buf[2] += minute % 10;
+
+    buf[3] = hour % 10;
+    if((hour / 20) == 1)
+    {
+        // set the 20 hour bit
+        buf[3] |= 0b00100000;
+    }
+    else if((hour / 10) == 1)
+    {
+        // set the 10 hour bit
+        buf[3] |= 0b00010000;
+    }
+
+    buf[4] = day;
+
+    buf[5] = date / 10;
+    buf[5] <<= 4;
+    buf[5] += date % 10;
+
+    buf[6] = month / 10;
+    buf[6] <<= 4;
+    buf[6] += month % 10;
+    
+    buf[7] = year / 10;
+    buf[7] <<= 4;
+    buf[7] += year % 10;
+
+    //std::uint8_t reg{0x0};
+    //write(i2cbus, &reg, 1);
+    write(i2cbus, buf, 8);
 
 }
 
@@ -86,7 +126,7 @@ void DS3231::readTime()
     time.minutes *= 10;
     time.minutes += buf[1] & 0b00001111;
 
-    time.hours
+    //time.hours
 
     std::cout << "time: "
               << std::setfill('0')
