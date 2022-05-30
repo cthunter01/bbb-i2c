@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[])
 {
-    /*
+
     BMP280 bmp280(2);
     if(bmp280.initComms())
     {
@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
         //bmp280.writeConfig();
         bmp280.takeMeasurement();
     }
-    */
+
     DS3231 ds3231(2);
     if(ds3231.initComms())
     {

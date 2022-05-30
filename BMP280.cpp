@@ -133,24 +133,27 @@ void BMP280::writeConfig()
     // 0.5 ms standby
     // no filter
     // No SPI
-    std::uint8_t reg{0xF5};
-    write(i2cbus, &reg, 1);
-    std::uint8_t val{0x0};
-    write(i2cbus, &val, 1);
+    std::uint8_t buf[2];
+    buf[0] = 0xF5;
+    buf[1] = 0x0;
+    write(i2cbus, buf, 2);
 }
 
 void BMP280::takeMeasurement()
 {
     writeConfig();
+    std::uint8_t buffer[2];
     std::uint8_t reg{0x0};
     std::uint8_t val{0x0};
 
     //val = (osrs_t << 5) | (osrs_p << 2) | mode;
     val = (3 << 5) | (3 << 2) | 1;
-    //write(i2cbus, &reg, 1);
+    write(i2cbus, &reg, 1);
     //reg = 0xF4;
     //write(i2cbus, &reg, 1);
-    write(i2cbus, &val, 1);
+    buffer[0] = 0xF4;
+    buffer[1] = val;
+    write(i2cbus, buffer, 2);
 
     usleep(100000);
     std::uint8_t buf[6];
