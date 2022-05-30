@@ -141,14 +141,25 @@ void BMP280::writeConfig()
 
 void BMP280::takeMeasurement()
 {
+    writeConfig();
     std::uint8_t reg{0x0};
     std::uint8_t val{0x0};
 
     //val = (osrs_t << 5) | (osrs_p << 2) | mode;
     val = (3 << 5) | (3 << 2) | 1;
-    write(i2cbus, &reg, 1);
-    reg = 0xF4;
-    write(i2cbus, &reg, 1);
+    //write(i2cbus, &reg, 1);
+    //reg = 0xF4;
+    //write(i2cbus, &reg, 1);
     write(i2cbus, &val, 1);
 
+    usleep(100000);
+    std::uint8_t buf[6];
+    if(read(i2cbus, buf, 6) < 6)
+    {
+        std::cout << "error reading bmp280\n";
+    }
+    std::uint32_t ut{0};
+    std::uint32_t up{0};
+    up = (buf[0] << 8) | buf[1];
+    std::cout << "up = " << std::to_string(up) << std::endl;
 }

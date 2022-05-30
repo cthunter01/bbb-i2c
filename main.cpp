@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
     if(bmp280.initComms())
     {
         bmp280.readCalibration();
-        bmp280.writeConfig();
+        //bmp280.writeConfig();
         bmp280.takeMeasurement();
     }
     // Try and open the bus
