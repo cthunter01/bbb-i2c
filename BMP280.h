@@ -3,9 +3,11 @@
 
 #include <cstdint>
 
+#include "I2CComm.h"
+
 // The address of the BMP280 is either 0x76 or 0x77
 // depending on the SDO pin pulled low or high (respectively)
-constexpr std::uint8_t addr{0x76};
+//constexpr std::uint8_t addr{0x76};
 
 enum class BMP280_OSRS_P
 {
@@ -37,39 +39,41 @@ enum class BMP280_MODE
 class BMP280
 {
 public:
-    BMP280(std::uint8_t b);
+    BMP280(std::uint8_t b, std::uint8_t addr);
     ~BMP280();
 
-    bool initComms();
     void readCalibration();
     void writeConfig();
     void takeMeasurement();
+    //double calculateTrueTemperatureDouble(long ut);
+    std::int32_t calculateTrueTemperature(std::int32_t ut);
+    std::uint32_t calculateTruePressure(std::int32_t up);
 
     typedef struct
     {
-        unsigned short T1;
-        short          T2;
-        short          T3;
-        unsigned short P1;
-        short          P2;
-        short          P3;
-        short          P4;
-        short          P5;
-        short          P6;
-        short          P7;
-        short          P8;
-        short          P9;
+        std::uint16_t T1;
+	std::int16_t  T2;
+	std::int16_t  T3;
+	std::uint16_t P1;
+	std::int16_t  P2;
+	std::int16_t  P3;
+	std::int16_t  P4;
+	std::int16_t  P5;
+	std::int16_t  P6;
+	std::int16_t  P7;
+	std::int16_t  P8;
+	std::int16_t  P9;
     } BMP280CalibrationStruct;
 
     BMP280CalibrationStruct calData;
-
-    std::uint8_t bus;
 
     BMP280_MODE mode;
     BMP280_OSRS_P osrs_p;
     BMP280_OSRS_T osrs_t;
 
-    int i2cbus;
+    std::int32_t t_fine;
+
+    I2CComm i2c_comm;
 
 };
 
