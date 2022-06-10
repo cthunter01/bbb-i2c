@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#include <memory>
+
 #include "I2CComm.h"
 
 // The address of the BMP280 is either 0x76 or 0x77
@@ -39,7 +41,7 @@ enum class BMP280_MODE
 class BMP280
 {
 public:
-    BMP280(std::uint8_t b, std::uint8_t addr);
+    BMP280(std::uint8_t inBus, std::uint8_t inAddr);
     ~BMP280();
 
     void readCalibration();
@@ -73,7 +75,7 @@ public:
 
     std::int32_t t_fine;
 
-    I2CComm i2c_comm;
+    std::unique_ptr<I2CComm> i2c_comm;
 
 };
 

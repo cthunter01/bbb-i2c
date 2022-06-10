@@ -21,12 +21,12 @@
 #include <string>
 #include <iostream>
 
-BMP280::BMP280(std::uint8_t b, std::uint8_t addr) :
+BMP280::BMP280(std::uint8_t inBus, std::uint8_t inAddr) :
     calData(),
     mode(BMP280_MODE::FORCED),
     osrs_p(BMP280_OSRS_P::STANDARD),
     osrs_t(BMP280_OSRS_T::STANDARD),
-    i2c_comm(b, addr)
+    i2c_comm(std::make_unique<I2CComm>(inBus, inAddr))
 {
 }
 
@@ -68,18 +68,18 @@ void BMP280::readCalibration()
     calData.P9 = (buf[23] << 8) | buf[22];
 
     // Print the calibration data
-    std::cout << "calData.T1: " << calData.T1 << std::endl;
-    std::cout << "calData.T2: " << calData.T2 << std::endl;
-    std::cout << "calData.T3: " << calData.T3 << std::endl;
-    std::cout << "calData.P1: " << calData.P1 << std::endl;
-    std::cout << "calData.P2: " << calData.P2 << std::endl;
-    std::cout << "calData.P3: " << calData.P3 << std::endl;
-    std::cout << "calData.P4: " << calData.P4 << std::endl;
-    std::cout << "calData.P5: " << calData.P5 << std::endl;
-    std::cout << "calData.P6: " << calData.P6 << std::endl;
-    std::cout << "calData.P7: " << calData.P7 << std::endl;
-    std::cout << "calData.P8: " << calData.P8 << std::endl;
-    std::cout << "calData.P9: " << calData.P9 << std::endl;
+    //std::cout << "calData.T1: " << calData.T1 << std::endl;
+    //std::cout << "calData.T2: " << calData.T2 << std::endl;
+    //std::cout << "calData.T3: " << calData.T3 << std::endl;
+    //std::cout << "calData.P1: " << calData.P1 << std::endl;
+    //std::cout << "calData.P2: " << calData.P2 << std::endl;
+    //std::cout << "calData.P3: " << calData.P3 << std::endl;
+    //std::cout << "calData.P4: " << calData.P4 << std::endl;
+    //std::cout << "calData.P5: " << calData.P5 << std::endl;
+    //std::cout << "calData.P6: " << calData.P6 << std::endl;
+    //std::cout << "calData.P7: " << calData.P7 << std::endl;
+    //std::cout << "calData.P8: " << calData.P8 << std::endl;
+    //std::cout << "calData.P9: " << calData.P9 << std::endl;
 }
 
 void BMP280::writeConfig()
@@ -98,7 +98,7 @@ void BMP280::writeConfig()
 
 void BMP280::takeMeasurement()
 {
-    writeConfig();
+    //writeConfig();
     std::uint8_t buffer[2];
     std::uint8_t reg{0x0};
     //write(i2cbus, &reg, 1);
@@ -130,14 +130,15 @@ void BMP280::takeMeasurement()
     // get raw temperature measurement
     ut = ((buf[3] << 16) | (buf[4] << 8) | buf[5]) >> 4;
 
-    std::cout << "up = " << std::to_string(up) << std::endl;
-    std::cout << "ut = " << std::to_string(ut) << std::endl;
+    //std::cout << "up = " << std::to_string(up) << std::endl;
+    //std::cout << "ut = " << std::to_string(ut) << std::endl;
     std::cout << "T = " << std::to_string(calculateTrueTemperature(ut)) << std::endl;
-    std::cout << "P = " << std::to_string(calculateTruePressure(up)) << std::endl;
+    //std::cout << "P = " << std::to_string(calculateTruePressure(up)) << std::endl;
     std::cout << "P2 = " << ((double)calculateTruePressure(up)/256.0) << std::endl;
 
 }
 
+// This is straight from the datasheet
 std::int32_t BMP280::calculateTrueTemperature(std::int32_t ut)
 {
 	std::int32_t var1, var2, T;
@@ -148,24 +149,25 @@ std::int32_t BMP280::calculateTrueTemperature(std::int32_t ut)
 	return T;
 }
 
+// This is straight from the datasheet
 std::uint32_t BMP280::calculateTruePressure(std::int32_t up)
 {
-std::int64_t var1, var2, p;
-var1 = ((std::int64_t)t_fine) - 128000;
-var2 = var1 * var1 * (std::int64_t)calData.P6;
-var2 = var2 + ((var1*(std::int64_t)calData.P5)<<17);
-var2 = var2 + (((std::int64_t)calData.P4)<<35);
-var1 = ((var1 * var1 * (std::int64_t)calData.P3)>>8) + ((var1 * (std::int64_t)calData.P2)<<12);
-var1 = (((((std::int64_t)1)<<47)+var1))*((std::int64_t)calData.P1)>>33;
-if(var1 == 0)
-{
-return 0;
-}
-p = 1048576 - up;
-p = (((p<<31)-var2)*3125)/var1;
-var1 = (((std::int64_t)calData.P9) * (p>>13) * (p>>13)) >> 25;
-var2 = (((std::int64_t)calData.P8) * p) >> 19;
-p = ((p + var1 + var2) >> 8) + (((std::int64_t)calData.P7)<<4);
-return (std::uint32_t)p;
+    std::int64_t var1, var2, p;
+    var1 = ((std::int64_t)t_fine) - 128000;
+    var2 = var1 * var1 * (std::int64_t)calData.P6;
+    var2 = var2 + ((var1*(std::int64_t)calData.P5)<<17);
+    var2 = var2 + (((std::int64_t)calData.P4)<<35);
+    var1 = ((var1 * var1 * (std::int64_t)calData.P3)>>8) + ((var1 * (std::int64_t)calData.P2)<<12);
+    var1 = (((((std::int64_t)1)<<47)+var1))*((std::int64_t)calData.P1)>>33;
+    if(var1 == 0)
+    {
+        return 0;
+    }
+    p = 1048576 - up;
+    p = (((p<<31)-var2)*3125)/var1;
+    var1 = (((std::int64_t)calData.P9) * (p>>13) * (p>>13)) >> 25;
+    var2 = (((std::int64_t)calData.P8) * p) >> 19;
+    p = ((p + var1 + var2) >> 8) + (((std::int64_t)calData.P7)<<4);
+    return (std::uint32_t)p;
 }
 

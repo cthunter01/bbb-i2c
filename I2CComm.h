@@ -6,9 +6,9 @@
 class I2CComm
 {
 public:
-    I2CComm(std::uint8_t busNumber,
-            std::uint8_t addr,
-            const char* pathName = "/dev/i2c-");
+    I2CComm(std::uint8_t inBus,
+            std::uint8_t inAddr,
+            const char* inPathName = "/dev/i2c-");
 
     ~I2CComm();
 
@@ -23,8 +23,12 @@ public:
 
 private:
     std::uint8_t bus;
+
+    std::uint8_t addr;
     
     int filedes;
+
+    std::string pathName;
 };
 
 #endif // I2CCOMM_H

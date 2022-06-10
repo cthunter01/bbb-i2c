@@ -26,15 +26,17 @@
 
 #include <string>
 
-I2CComm::I2CComm(std::uint8_t busNumber,
-                 std::uint8_t addr,
-                 const char* pathName)
+I2CComm::I2CComm(std::uint8_t inBus,
+                 std::uint8_t inAddr,
+                 const char* inPathName) :
+    bus(inBus),
+    addr(inAddr),
+    filedes(0),
+    pathName(inPathName)
 {
-    std::string i2cbusName(pathName);
-    i2cbusName += std::to_string(busNumber);
-
+    pathName += std::to_string(bus);
     // Try and open the bus
-    filedes = open(i2cbusName.c_str(), O_RDWR);
+    filedes = open(pathName.c_str(), O_RDWR);
     if(filedes < 0)
     {
         perror("Failed to open the i2c bus");
@@ -47,7 +49,6 @@ I2CComm::I2CComm(std::uint8_t busNumber,
         perror("Failed to acquire bus access and/or talk to slave");
     }
 }
-
 
 I2CComm::~I2CComm()
 {
