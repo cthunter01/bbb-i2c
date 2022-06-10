@@ -51,7 +51,7 @@ void BMP280::readCalibration()
     std::uint8_t buf[24];
     //reg = 0x88;
 
-    i2c_comm.readData(0x88, buf, 24);
+    i2c_comm->readData(0x88, buf, 24);
 
     calData.T1 = (buf[1] << 8) | buf[0];
     calData.T2 = (buf[3] << 8) | buf[2];
@@ -92,7 +92,7 @@ void BMP280::writeConfig()
     //buf[0] = 0xF5;
     //buf[1] = 0x0;
     std::uint8_t data = 0x0;
-    i2c_comm.writeData(0xF5, &data, 1);
+    i2c_comm->writeData(0xF5, &data, 1);
     //write(i2cbus, buf, 2);
 }
 
@@ -110,13 +110,13 @@ void BMP280::takeMeasurement()
     buffer[1] = val;
     //write(i2cbus, buffer, 2);
 
-    i2c_comm.writeData(0xF4, &val, 1);
+    i2c_comm->writeData(0xF4, &val, 1);
     usleep(1000000);
     reg = 0xF7;
     //write(i2cbus, &reg, 1);
     std::uint8_t buf[6];
     
-    if(i2c_comm.readData(reg, buf, 6) < 6)
+    if(i2c_comm->readData(reg, buf, 6) < 6)
     {
         std::cout << "error reading bmp280\n";
     }

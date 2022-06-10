@@ -2,6 +2,7 @@
 #define I2CCOMM_H
 
 #include <cstdint>
+#include <string>
 
 class I2CComm
 {
