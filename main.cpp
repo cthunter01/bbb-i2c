@@ -16,11 +16,10 @@ int main(int argc, char* argv[])
         bmp280.writeConfig();
         bmp280.takeMeasurement();
     }
-/*
-    DS3231 ds3231(2);
+    DS3231 ds3231(2, 0x68);
     if(ds3231.initComms())
     {
-
+/*
         ds3231.writeTime(22,
                          5,
                          30,
@@ -28,14 +27,13 @@ int main(int argc, char* argv[])
                          17,
                          57,
                          0);
-
-        for(int i = 0; i < 60; ++i)
+*/
+        for(int i = 0; i < 3; ++i)
         {
             usleep(1000000);
             ds3231.readTime();
         }
     }
-*/
     return 0;
 }
 

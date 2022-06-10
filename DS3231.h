@@ -2,13 +2,17 @@
 #define DS3231_H
 #include <cstdint>
 
+#include <memory>
+
+#include "I2CComm.h"
+
 // The address of the DS3231 is 
 constexpr std::uint8_t ds3231_addr{0x68};
 
 class DS3231
 {
 public:
-    DS3231(std::uint8_t b);
+    DS3231(std::uint8_t b, std::uint8_t a);
     ~DS3231();
 
     bool initComms();
@@ -31,10 +35,9 @@ public:
         std::uint8_t month;
         std::uint8_t year;
     } TimeStruct;
-    
-    std::uint8_t bus;
 
-    int i2cbus;
+private:
+    std::unique_ptr<I2CComm> i2c_comm;
 
 };
 

@@ -76,7 +76,7 @@ void I2CComm::writeData(std::uint8_t reg,
                         std::uint8_t nbytes)
 {
     std::uint8_t* temp = static_cast<std::uint8_t*>(std::calloc(nbytes + 1, sizeof(std::uint8_t)));
-    buf[0] = reg;
+    temp[0] = reg;
     std::memcpy(&temp[1], buf, nbytes);
     write(filedes, temp, nbytes+1);
     std::free(temp);
